@@ -1,5 +1,4 @@
 import { useState } from "react";
-import "./App.css";
 
 const tempMovieData = [
   {
@@ -52,22 +51,54 @@ const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 export default function App() {
+  const [movies, setMovies] = useState(tempMovieData);
+  const [watched, setWatched] = useState(tempWatchedData);
+  // we are doing the propdrilling
   return (
     <>
-      <Navbar />
-      <Main />
+      {/* here we are entering the children compostion */}
+      <Navbar>
+        {/* here we are using the navbar composition using child to parent
+         so we use it to solve the problem of prop drilling  */}
+        <Logo />
+        <Search />
+        <Numresults movies={movies} />
+      </Navbar>
+
+      <Main>
+        {/* Explicit describes something that is very clear and without vagueness or ambiguity. 
+        Implicit often functions as the opposite, referring
+         to something that is understood, but not described clearly or directly,
+          and often using implication or assumption. */}
+        {/* here we are using the explict way */}
+        {/* 
+        <Box element={<ListMovies movies={movies} />} />
+
+        <Box
+          element={
+            <>
+              <WatchedSummary watched={watched} />
+              <WatchedMoviesList watched={watched} />
+            </>
+          }
+        /> */}
+
+        {/* Down here we are using the impicit way  */}
+        <Box>
+          <ListMovies movies={movies} />
+        </Box>
+        {/* we are using  the reusable box   and allow any children to  passed in*/}
+        <Box>
+          <WatchedSummary watched={watched} />
+          <WatchedMoviesList watched={watched} />
+        </Box>
+      </Main>
     </>
   );
 }
 
-function Navbar() {
-  return (
-    <nav className="nav-bar">
-      <Logo />
-      <Search />
-      <Numresults />
-    </nav>
-  );
+function Navbar({ children }) {
+  return <nav className="nav-bar">{children}</nav>;
 }
 
 function Logo() {
@@ -91,40 +122,54 @@ function Search() {
     />
   );
 }
-function Numresults() {
+function Numresults({ movies }) {
   return (
     <p className="num-results">
-      Found <strong>X</strong> results
+      Found <strong>{movies.length}</strong> results
     </p>
   );
 }
 
-function Main() {
-  return (
-    <main className="main">
-      <ListBox />
-      <WatchedBox />
-    </main>
-  );
+function Main({ children }) {
+  return <main className="main">{children}</main>;
 }
 
-function ListBox() {
-  const [isOpen1, setIsOpen1] = useState(true);
+function Box({ children }) {
+  const [isOpen, setIsOpen] = useState(true);
   return (
     <div className="box">
-      <button
-        className="btn-toggle"
-        onClick={() => setIsOpen1((open) => !open)}
-      >
-        {isOpen1 ? "–" : "+"}
+      <button className="btn-toggle" onClick={() => setIsOpen((open) => !open)}>
+        {isOpen ? "–" : "+"}
       </button>
-      {isOpen1 && <ListMovies />}
+      {/* here we don't need to enter the object again because it is already an object */}
+      {isOpen && children}
     </div>
   );
 }
 
-function ListMovies() {
-  const [movies, setMovies] = useState(tempMovieData);
+// function WatchedBox() {
+//   const [watched, setWatched] = useState(tempWatchedData);
+//   const [isOpen2, setIsOpen2] = useState(true);
+
+//   return (
+//     <div className="box">
+//       <button
+//         className="btn-toggle"
+//         onClick={() => setIsOpen2((open) => !open)}
+//       >
+//         {isOpen2 ? "–" : "+"}
+//       </button>
+//       {isOpen2 && (
+//         <>
+//           <WatchedSummary watched={watched} />
+//           <WatchedMoviesList watched={watched} />
+//         </>
+//       )}
+//     </div>
+//   );
+// }
+
+function ListMovies({ movies }) {
   return (
     <ul className="list">
       {movies?.map((movie) => (
@@ -146,28 +191,6 @@ function Movie({ movie }) {
         </p>
       </div>
     </li>
-  );
-}
-
-function WatchedBox() {
-  const [watched, setWatched] = useState(tempWatchedData);
-  const [isOpen2, setIsOpen2] = useState(true);
-
-  return (
-    <div className="box">
-      <button
-        className="btn-toggle"
-        onClick={() => setIsOpen2((open) => !open)}
-      >
-        {isOpen2 ? "–" : "+"}
-      </button>
-      {isOpen2 && (
-        <>
-          <WatchedSummary watched={watched} />
-          <WatchedMoviesList watched={watched} />
-        </>
-      )}
-    </div>
   );
 }
 
